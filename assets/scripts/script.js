@@ -17,12 +17,14 @@ $(function () {
   }
 
   // calculate if the time is in the past, present, or future
-  function calculateTimeType(currentHour) {
-    let timeType = 'past';
-    if (dayjs().hour() === currentHour) {
+  function calculateTimeType(timeBlockId) {
+    var workDayHour = extractHourFromId(timeBlockId);
+    var timeType = 'past';
+
+    if (dayjs().hour() === workDayHour) {
       timeType = 'present';
     }
-    if (dayjs().hour() < currentHour) {
+    if (dayjs().hour() < workDayHour) {
       timeType = 'future';
     }
 
@@ -30,17 +32,25 @@ $(function () {
   }
 
   // create the row element
-  function createRowEl(workDayHour, timeType) {
+  function createRowEl(workDayHour) {
     return $('<div>')
-      .addClass('row time-block ' + timeType)
+      .addClass('row time-block ')
       .attr({ id: 'hour-' + workDayHour });
   }
 
-  // create time element
-  function createTimeEl(workDayHour) {
+  // extract the hour from the id e.g. (hour-10)
+  function extractHourFromId(workDayHourId) {
+    if (workDayHourId) {
+      return parseInt(workDayHourId.split('-')[1]);
+    }
+  }
+
+  // create time element by converting workday hour into specified format
+  function createTimeEl(workDayHourId, workDayHours) {
+    var workDayHour = extractHourFromId(workDayHourId);
     return $('<div>')
       .addClass('col-2 col-md-1 hour text-center py-3')
-      .text('9AM');
+      .text(dayjs().hour(workDayHour).format('hA'));
   }
 
   // create description element
@@ -66,11 +76,11 @@ $(function () {
     var workDayHours = [9, 10, 11, 12, 13, 14, 15, 16, 17];
 
     for (var i = 0; i < workDayHours.length; i++) {
-      var timeType = calculateTimeType(workDayHours[i]);
+      var rowEl = createRowEl(workDayHours[i]);
+      var timeType = calculateTimeType(rowEl.attr('id'));
+      rowEl.addClass(timeType);
 
-      var rowEl = createRowEl(workDayHours[i], timeType);
-
-      createTimeEl(workDayHours[i]).appendTo(rowEl);
+      createTimeEl(rowEl.attr('id'), workDayHours).appendTo(rowEl);
       createDescriptionEl().appendTo(rowEl);
       createSaveBtnEl().appendTo(rowEl);
 
