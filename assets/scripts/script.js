@@ -1,18 +1,86 @@
-dayjs.extend(window.dayjs_plugin_advancedFormat);
-
 $(function () {
+  //extend dayjs to use the advancedformat plugin for ordinal use
+  dayjs.extend(window.dayjs_plugin_advancedFormat);
+
+  var containerEl = $('#container');
+
+  // get the curernt day in the specified format using the advancedFormat plugin
   function getCurrentDay() {
     var format = 'dddd, MMMM, Do';
     return dayjs().format(format);
   }
 
+  // display the current day in the header of the page
   function displayCurrentDay() {
     var currentDayEl = $('#currentDay');
     currentDayEl.text(getCurrentDay());
   }
 
+  // calculate if the time is in the past, present, or future
+  function calculateTimeType(currentHour) {
+    let timeType = 'past';
+    if (dayjs().hour() === currentHour) {
+      timeType = 'present';
+    }
+    if (dayjs().hour() < currentHour) {
+      timeType = 'future';
+    }
+
+    return timeType;
+  }
+
+  // create the row element
+  function createRowEl(workDayHour, timeType) {
+    return $('<div>')
+      .addClass('row time-block ' + timeType)
+      .attr({ id: 'hour-' + workDayHour });
+  }
+
+  // create time element
+  function createTimeEl(workDayHour) {
+    return $('<div>')
+      .addClass('col-2 col-md-1 hour text-center py-3')
+      .text('9AM');
+  }
+
+  // create description element
+  function createDescriptionEl() {
+    return $('<textarea>')
+      .addClass('col-8 col-md-10 description')
+      .attr({ rows: 3 });
+  }
+
+  // create save button and append font awesome save icon to button
+  function createSaveBtnEl() {
+    var saveBtnEl = $('<button>')
+      .addClass('btn saveBtn col-2 col-md-1')
+      .attr({ ariaLabel: 'save' });
+
+    var iconEl = $('<i>').addClass('fas fa-save').attr({ ariaHidden: true });
+
+    iconEl.appendTo(saveBtnEl);
+    return saveBtnEl;
+  }
+
+  function displayTimeBlocks() {
+    var workDayHours = [9, 10, 11, 12, 13, 14, 15, 16, 17];
+
+    for (var i = 0; i < workDayHours.length; i++) {
+      var timeType = calculateTimeType(workDayHours[i]);
+
+      var rowEl = createRowEl(workDayHours[i], timeType);
+
+      createTimeEl(workDayHours[i]).appendTo(rowEl);
+      createDescriptionEl().appendTo(rowEl);
+      createSaveBtnEl().appendTo(rowEl);
+
+      rowEl.appendTo(containerEl);
+    }
+  }
+
   function main() {
     displayCurrentDay();
+    displayTimeBlocks();
   }
 
   main();
