@@ -108,6 +108,19 @@ $(function () {
     var key = $(this).parent().attr('id');
 
     localStorage.setItem(key, event);
+    if (event.trim().length > 0) {
+      showSuccessMessage();
+    }
+  }
+
+  // display a message that tells the user that an event has been added to localstorage that lasts 3 seconds then disappears
+  function showSuccessMessage() {
+    var message = $('#message');
+    $(message).removeClass('hidden');
+
+    setTimeout(function () {
+      $(message).addClass('hidden');
+    }, 3000);
   }
 
   function main() {
